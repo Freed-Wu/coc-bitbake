@@ -832,7 +832,8 @@
     "package": "npm run vscode:prepublish && vsce package"
   },
   "dependencies": {
-    "find": "^0.2.7"
+    "find": "^0.2.7",
+    "language-server-bitbake": "^2.2.0"
   },
   "devDependencies": {
     "@types/find": "^0.2.2",
