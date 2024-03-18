@@ -1,5 +1,5 @@
 {
-  "name": "yocto-bitbake",
+  "name": "coc-bitbake",
   "displayName": "Yocto Project BitBake",
   "description": "Extended Yocto Project and BitBake language support",
   "author": {
@@ -15,24 +15,28 @@
   "publisher": "yocto-project",
   "icon": "images/icon.png",
   "bugs": {
-    "url": "https://github.com/yoctoproject/vscode-bitbake/issues"
+    "url": "https://github.com/Freed-Wu/coc-bitbake/issues"
   },
-  "homepage": "https://github.com/yoctoproject/vscode-bitbake/",
+  "homepage": "https://github.com/Freed-Wu/coc-bitbake/",
   "repository": {
     "type": "git",
-    "url": "https://github.com/yoctoproject/vscode-bitbake.git"
+    "url": "https://github.com/Freed-Wu/coc-bitbake.git"
   },
+  "keywords": [
+    "coc.nvim"
+  ],
   "engines": {
-    "vscode": "^1.75.0"
+    "coc": "^0.0.82"
   },
   "categories": [
     "Programming Languages"
   ],
   "activationEvents": [
+    "onLanguage:bitbake",
     "workspaceContains:**/bblayers.conf",
     "workspaceContains:**/*.bb"
   ],
-  "main": "./out/extension",
+  "main": "./out/extension.js",
   "browser": "./out/extension-web",
   "contributes": {
     "languages": [
@@ -834,6 +838,7 @@
     }
   },
   "scripts": {
+    "prepack": "tsc",
     "test": "npm run test:grammar",
     "test:grammar": "vscode-tmgrammar-test ./test/grammars/test-cases/*.bb",
     "snap-grammar": "vscode-tmgrammar-snap ./test/grammars/snaps/*.bb -u",
@@ -849,7 +854,8 @@
   "devDependencies": {
     "@types/find": "^0.2.2",
     "@types/node": "^20.6.2",
-    "@types/vscode": "^1.75.1"
+    "coc.nvim": "^0.0.83-next.18",
+    "typescript": "^5.3.3"
   },
   "workspaces": [
     "src/lib"

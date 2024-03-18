@@ -1,5 +1,28 @@
 # BitBake recipe language support plugin for Visual Studio Code
 
+Ported from [vscode-bitbake](https://github.com/yoctoproject/vscode-bitbake).
+
+Because some APIs of [vscode](github.com/microsoft/vscode) are missing in
+[coc.nvim](https://github.com/neoclide/coc.nvim), disable some features
+temporarily:
+
+- all commands about terminal: miss `vscode.terminal`
+
+## Install
+
+- [coc-marketplace](https://github.com/fannheyward/coc-marketplace)
+- [npm](https://www.npmjs.com/package/coc-bitbake)
+- vim:
+
+```vim
+" command line
+CocInstall coc-bitbake
+" or add the following code to your vimrc
+let g:coc_global_extensions = ['coc-bitbake', 'other coc-plugins']
+```
+
+---
+
 [![vscode-bitbake CI/CD](https://github.com/yoctoproject/vscode-bitbake/actions/workflows/main.yml/badge.svg?branch=main)](https://github.com/yoctoproject/vscode-bitbake/actions/workflows/main.yml?query=branch%3Amain)
 
 **For a description of the extension itself, please see [the client's README](./client/README.md)**.
