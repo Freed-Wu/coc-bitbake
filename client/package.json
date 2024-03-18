@@ -1,5 +1,5 @@
 {
-  "name": "yocto-bitbake",
+  "name": "coc-bitbake",
   "displayName": "Yocto Project BitBake",
   "description": "Extended Yocto Project and BitBake language support",
   "author": {
@@ -15,24 +15,28 @@
   "publisher": "yocto-project",
   "icon": "images/icon.png",
   "bugs": {
-    "url": "https://github.com/yoctoproject/vscode-bitbake/issues"
+    "url": "https://github.com/Freed-Wu/coc-bitbake/issues"
   },
-  "homepage": "https://github.com/yoctoproject/vscode-bitbake/",
+  "homepage": "https://github.com/Freed-Wu/coc-bitbake/",
   "repository": {
     "type": "git",
-    "url": "https://github.com/yoctoproject/vscode-bitbake.git"
+    "url": "https://github.com/Freed-Wu/coc-bitbake.git"
   },
+  "keywords": [
+    "coc.nvim"
+  ],
   "engines": {
-    "vscode": "^1.75.0"
+    "coc": "^0.0.82"
   },
   "categories": [
     "Programming Languages"
   ],
   "activationEvents": [
+    "onLanguage:bitbake",
     "workspaceContains:**/bblayers.conf",
     "workspaceContains:**/*.bb"
   ],
-  "main": "./out/extension",
+  "main": "./out/extension.js",
   "browser": "./out/extension-web",
   "contributes": {
     "languages": [
@@ -767,55 +771,46 @@
           "command": "bitbake.devtool-build",
           "group": "0@devtool_build@0",
           "when": "viewItem == devtoolWorskpaceCtx"
-
         },
         {
           "command": "bitbake.devtool-clean",
           "group": "0@devtool_build@1",
           "when": "viewItem == devtoolWorskpaceCtx"
-
         },
         {
           "command": "bitbake.devtool-deploy",
           "group": "0@devtool_build@2",
           "when": "viewItem == devtoolWorskpaceCtx"
-
         },
         {
           "command": "bitbake.devtool-open-workspace",
           "group": "1@devtool_dev@0",
           "when": "viewItem == devtoolWorskpaceCtx"
-
         },
         {
           "command": "bitbake.devtool-ide-sdk",
           "group": "1@devtool_dev@1",
           "when": "viewItem == devtoolWorskpaceCtx"
-
         },
         {
           "command": "bitbake.devtool-sdk-fallback",
           "group": "1@devtool_dev@2",
           "when": "viewItem == devtoolWorskpaceCtx"
-
         },
         {
           "command": "bitbake.terminal-profile",
           "group": "1@devtool_dev@3",
           "when": "viewItem == devtoolWorskpaceCtx"
-
         },
         {
           "command": "bitbake.devtool-update",
           "group": "1@devtool_finalize@0",
           "when": "viewItem == devtoolWorskpaceCtx"
-
         },
         {
           "command": "bitbake.devtool-reset",
           "group": "1@devtool_finalize@1",
           "when": "viewItem == devtoolWorskpaceCtx"
-
         }
       ]
     },
@@ -829,6 +824,7 @@
     }
   },
   "scripts": {
+    "prepack": "tsc",
     "test": "npm run test:grammar",
     "test:grammar": "vscode-tmgrammar-test ./test/grammars/test-cases/*.bb",
     "snap-grammar": "vscode-tmgrammar-snap ./test/grammars/snaps/*.bb -u",
@@ -836,14 +832,13 @@
     "package": "npm run vscode:prepublish && vsce package"
   },
   "dependencies": {
-    "find": "^0.2.7",
-    "node-pty": "^1.0.0",
-    "vscode-languageclient": "^8.1.0"
+    "find": "^0.2.7"
   },
   "devDependencies": {
     "@types/find": "^0.2.2",
     "@types/node": "^20.6.2",
-    "@types/vscode": "^1.75.1"
+    "coc.nvim": "^0.0.83-next.18",
+    "typescript": "^5.3.3"
   },
   "workspaces": [
     "src/lib"
