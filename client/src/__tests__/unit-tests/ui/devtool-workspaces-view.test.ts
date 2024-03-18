@@ -3,7 +3,7 @@
  * Licensed under the MIT License. See License.txt in the project root for license information.
  * ------------------------------------------------------------------------------------------ */
 
-import * as vscode from 'vscode'
+import * as vscode from 'coc.nvim'
 import { type DevtoolWorkspaceTreeItem, DevtoolWorkspacesView } from '../../../ui/DevtoolWorkspacesView'
 import { BitBakeProjectScanner } from '../../../driver/BitBakeProjectScanner'
 import { type BitbakeScanResult } from '../../../lib/src/types/BitbakeScanResult'

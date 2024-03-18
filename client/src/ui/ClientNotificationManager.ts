@@ -3,7 +3,7 @@
  * Licensed under the MIT License. See License.txt in the project root for license information.
  * ------------------------------------------------------------------------------------------ */
 
-import { type Memento, commands, window } from 'vscode'
+import { type Memento, commands, window } from 'coc.nvim'
 import { logger } from '../lib/src/utils/OutputLogger'
 
 export class ClientNotificationManager {
@@ -87,7 +87,7 @@ You can configure the sources' workspace to use the Yocto SDK for cross-compilat
       })
   }
 
-  private neverShowAgain (method: string): Thenable<void> {
+  private neverShowAgain (method: string): Promise<void> {
     if (this._memento === undefined) {
       throw new Error('ClientNotificationManager Memento not set')
     }

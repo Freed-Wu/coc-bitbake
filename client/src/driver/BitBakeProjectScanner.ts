@@ -6,7 +6,7 @@
 import find from 'find'
 import path from 'path'
 import EventEmitter from 'events'
-import * as vscode from 'vscode'
+import * as vscode from 'coc.nvim'
 
 import { logger } from '../lib/src/utils/OutputLogger'
 
@@ -19,11 +19,11 @@ import type {
 } from '../lib/src/types/BitbakeScanResult'
 
 import { type BitbakeDriver } from './BitbakeDriver'
-import { type LanguageClient } from 'vscode-languageclient/node'
+import { type LanguageClient } from 'coc.nvim'
 import fs from 'fs'
-import { runBitbakeTerminalCustomCommand } from '../ui/BitbakeTerminal'
+// import { runBitbakeTerminalCustomCommand } from '../ui/BitbakeTerminal'
 import { bitbakeESDKMode } from './BitbakeESDK'
-import { finishProcessExecution } from '../utils/ProcessUtils'
+// import { finishProcessExecution } from '../utils/ProcessUtils'
 import { extractRecipeName, extractRecipeVersion } from '../lib/src/utils/files'
 
 interface ScannStatus {
@@ -249,12 +249,12 @@ export class BitBakeProjectScanner {
       // Showing a modal here because this can only happend through the command devtool-update-recipe which is not used often
       if (!quiet) {
         await vscode.window.showErrorMessage(
-          'Bitbake extension couldn\'t locate a file.', {
+          'Bitbake extension couldn\'t locate a file.', /* {
             modal: true,
             detail: `It looks like you are using the bitbake.commandWrapper setting to use a docker container.\n
 Couldn't find ${inputPath} corresponding paths inside and outside of the container.\n
 You should adjust your docker volumes to use the same URIs as those present on your host machine.`
-          })
+          } */)
       }
       return resolvedPath
     }
@@ -273,9 +273,10 @@ You should adjust your docker volumes to use the same URIs as those present on y
   }
 
   private async existsInContainer (containerPath: string): Promise<boolean> {
-    const process = runBitbakeTerminalCustomCommand(this._bitbakeDriver, 'test -e ' + containerPath, 'BitBake: Test file', true)
-    const res = finishProcessExecution(process, async () => { await this.bitbakeDriver.killBitbake() })
-    return (await res).status === 0
+    // const process = runBitbakeTerminalCustomCommand(this._bitbakeDriver, 'test -e ' + containerPath, 'BitBake: Test file', true)
+    // const res = finishProcessExecution(process, async () => { await this.bitbakeDriver.killBitbake() })
+    // return (await res).status === 0
+    return true;
   }
 
   private searchFiles (pattern: string): ElementInfo[] {
@@ -464,13 +465,14 @@ You should adjust your docker volumes to use the same URIs as those present on y
     if (this._bitbakeDriver === undefined) {
       throw new Error('Bitbake driver is not set')
     }
-    const result = await finishProcessExecution(runBitbakeTerminalCustomCommand(this._bitbakeDriver, command, 'BitBake: Scan Project', true),
-      async () => { await this.bitbakeDriver.killBitbake() })
-    if (result.status !== 0) {
-      logger.error(`Failed to execute bitbake command: ${command}`)
-      throw new Error(`Failed to execute bitbake command: ${command}\r\n${result.stderr.toString()}`)
-    }
-    return result.output.toString()
+    // const result = await finishProcessExecution(runBitbakeTerminalCustomCommand(this._bitbakeDriver, command, 'BitBake: Scan Project', true),
+    //   async () => { await this.bitbakeDriver.killBitbake() })
+    // if (result.status !== 0) {
+    //   logger.error(`Failed to execute bitbake command: ${command}`)
+    //   throw new Error(`Failed to execute bitbake command: ${command}\r\n${result.stderr.toString()}`)
+    // }
+    // return result.output.toString()
+    return "";
   }
 }
 

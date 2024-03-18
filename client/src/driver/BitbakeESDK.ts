@@ -9,7 +9,7 @@ import { type DevtoolWorkspaceInfo } from '../lib/src/types/BitbakeScanResult'
 import { loadJsonFile, setJsonProperty, saveJsonFile, mergeJsonArray } from '../utils/JSONFile'
 import fs from 'fs'
 import { logger } from '../lib/src/utils/OutputLogger'
-import { type LanguageClient } from 'vscode-languageclient/node'
+import { type LanguageClient } from 'coc.nvim'
 import { getVariableValue } from '../language/languageClient'
 import { type BitBakeProjectScanner } from './BitBakeProjectScanner'
 

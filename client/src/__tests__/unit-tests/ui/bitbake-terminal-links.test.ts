@@ -3,7 +3,7 @@
  * Licensed under the MIT License. See License.txt in the project root for license information.
  * ------------------------------------------------------------------------------------------ */
 
-import * as vscode from 'vscode'
+import * as vscode from 'coc.nvim'
 import { BitbakeTerminalLinkProvider } from '../../../ui/BitbakeTerminalLinkProvider'
 import { type BitBakeProjectScanner } from '../../../driver/BitBakeProjectScanner'
 
