@@ -9,7 +9,7 @@ import { type DevtoolWorkspaceInfo } from '../lib/src/types/BitbakeScanResult'
 import { loadJsonFile, setJsonProperty, saveJsonFile, mergeJsonArray } from '../utils/JSONFile'
 import fs from 'fs'
 import { logger } from '../lib/src/utils/OutputLogger'
-import { type LanguageClient } from 'vscode-languageclient/node'
+import { type LanguageClient } from 'coc.nvim'
 import { getVariableValue } from '../language/languageClient'
 import { type BitBakeProjectScanner } from './BitBakeProjectScanner'
 
@@ -55,27 +55,27 @@ export function generateTasksDefinitions (workspace: DevtoolWorkspaceInfo, bitba
   setJsonProperty(vscodeTasks, 'version', '2.0.0')
   const recipeName = workspace.name
   const newTasks = []
-  newTasks.push({
-    label: `Devtool Build ${recipeName}`,
-    type: 'bitbake',
-    group: {
-      kind: 'build'
-    },
-    specialCommand: `devtool build ${recipeName}`
-  })
-  newTasks.push({
-    label: `Devtool Clean ${recipeName}`,
-    type: 'bitbake',
-    specialCommand: `devtool build -c ${recipeName}`
-  })
-  if (bitbakeSettings.sshTarget !== undefined && bitbakeSettings.sshTarget !== '') {
-    newTasks.push({
-      label: `Devtool Deploy ${recipeName}`,
-      type: 'bitbake',
-      specialCommand: `devtool deploy-target ${recipeName} ${bitbakeSettings.sshTarget}`,
-      dependsOn: [`BitBake Build ${recipeName}`]
-    })
-  }
+  // newTasks.push({
+  //   label: `Devtool Build ${recipeName}`,
+  //   type: 'bitbake',
+  //   group: {
+  //     kind: 'build'
+  //   },
+  //   specialCommand: `devtool build ${recipeName}`
+  // })
+  // newTasks.push({
+  //   label: `Devtool Clean ${recipeName}`,
+  //   type: 'bitbake',
+  //   specialCommand: `devtool build -c ${recipeName}`
+  // })
+  // if (bitbakeSettings.sshTarget !== undefined && bitbakeSettings.sshTarget !== '') {
+  //   newTasks.push({
+  //     label: `Devtool Deploy ${recipeName}`,
+  //     type: 'bitbake',
+  //     specialCommand: `devtool deploy-target ${recipeName} ${bitbakeSettings.sshTarget}`,
+  //     dependsOn: [`BitBake Build ${recipeName}`]
+  //   })
+  // }
   const tasks = vscodeTasks.tasks
   if (tasks === undefined) {
     vscodeTasks.tasks = newTasks

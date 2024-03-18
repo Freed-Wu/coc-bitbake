@@ -11,29 +11,29 @@ import {
   window,
   commands,
   languages,
-  TabInputText,
+  // TabInputText,
   Uri
-} from 'vscode'
+} from 'coc.nvim'
 
 import {
   LanguageClient,
   type LanguageClientOptions,
   TransportKind,
   type ServerOptions
-} from 'vscode-languageclient/node'
-import { middlewareProvideCompletion } from './middlewareCompletion'
-import { middlewareProvideHover } from './middlewareHover'
+} from 'coc.nvim'
+// import { middlewareProvideCompletion } from './middlewareCompletion'
+// import { middlewareProvideHover } from './middlewareHover'
 import { requestsManager } from './RequestManager'
-import { middlewareProvideDefinition } from './middlewareDefinition'
+// import { middlewareProvideDefinition } from './middlewareDefinition'
 import { embeddedLanguageDocsManager } from './EmbeddedLanguageDocsManager'
 import { logger } from '../lib/src/utils/OutputLogger'
 import { NotificationMethod, type NotificationParams } from '../lib/src/types/notifications'
-import { updateDiagnostics } from './diagnosticsSupport'
-import { getLanguageConfiguration } from './languageConfiguration'
-import { BitbakeCodeActionProvider } from './codeActionProvider'
+// import { updateDiagnostics } from './diagnosticsSupport'
+// import { getLanguageConfiguration } from './languageConfiguration'
+// import { BitbakeCodeActionProvider } from './codeActionProvider'
 import { type BitBakeProjectScanner } from '../driver/BitBakeProjectScanner'
-import * as vscode from 'vscode'
-import { middlewareProvideReferences } from './middlewareReferences'
+import * as vscode from 'coc.nvim'
+// import { middlewareProvideReferences } from './middlewareReferences'
 
 export async function activateLanguageServer (context: ExtensionContext, bitBakeProjectScanner: BitBakeProjectScanner): Promise<LanguageClient> {
   const serverModule = path.join(__dirname, 'server.js')
@@ -60,31 +60,25 @@ export async function activateLanguageServer (context: ExtensionContext, bitBake
     // Register the server for bitbake documents
     // TODO: check new documentSelector
     documentSelector: [{ scheme: 'file', language: 'bitbake' }],
-    middleware: {
-      provideCompletionItem: middlewareProvideCompletion,
-      provideDefinition: middlewareProvideDefinition,
-      provideHover: middlewareProvideHover,
-      provideReferences: middlewareProvideReferences
-    }
   }
 
-  languages.setLanguageConfiguration('bitbake', getLanguageConfiguration())
-
-  languages.onDidChangeDiagnostics(e => {
-    e.uris.forEach(uri => {
-      void updateDiagnostics(uri)
-    })
-  })
-
-  context.subscriptions.push(
-    languages.registerCodeActionsProvider('bitbake', new BitbakeCodeActionProvider())
-  )
-
-  if (context.storageUri?.fsPath === undefined) {
-    logger.error('Failed to get storage path')
-  } else {
-    await embeddedLanguageDocsManager.setStoragePath(context.storageUri.fsPath)
-  }
+  // languages.setLanguageConfiguration('bitbake', getLanguageConfiguration())
+  //
+  // languages.onDidChangeDiagnostics(e => {
+  //   e.uris.forEach(uri => {
+  //     void updateDiagnostics(uri)
+  //   })
+  // })
+  //
+  // context.subscriptions.push(
+  //   languages.registerCodeActionsProvider('bitbake', new BitbakeCodeActionProvider())
+  // )
+  //
+  // if (context.storageUri?.fsPath === undefined) {
+  //   logger.error('Failed to get storage path')
+  // } else {
+  //   await embeddedLanguageDocsManager.setStoragePath(context.storageUri.fsPath)
+  // }
 
   // Create the language client and start the client.
   const client: LanguageClient = new LanguageClient('bitbake', 'Bitbake Language Server', serverOptions, clientOptions)
@@ -123,27 +117,27 @@ export async function activateLanguageServer (context: ExtensionContext, bitBake
     void embeddedLanguageDocsManager.saveEmbeddedLanguageDocs(embeddedLanguageDocs)
   })
 
-  window.tabGroups.onDidChangeTabs((event) => {
-    [...event.opened, ...event.changed].forEach((tab) => {
-      if (tab.input instanceof TabInputText) {
-        const uri = tab.input.uri
-        if (embeddedLanguageDocsManager.embeddedLanguageDocsFolder === undefined) {
-          return
-        }
-        // Close embedded document tabs when they open automatically
-        if (uri.fsPath.includes(embeddedLanguageDocsManager.embeddedLanguageDocsFolder)) {
-          if (
-            // Prevent prompt to appear on unsaved files
-            !tab.isDirty &&
-            // Make possible to open embedded documents in a tab
-            !tab.isPreview && !tab.isActive && !tab.isPinned
-          ) {
-            void window.tabGroups.close(tab, false)
-          }
-        }
-      }
-    })
-  })
+  // window.tabGroups.onDidChangeTabs((event) => {
+  //   [...event.opened, ...event.changed].forEach((tab) => {
+  //     if (tab.input instanceof TabInputText) {
+  //       const uri = tab.input.uri
+  //       if (embeddedLanguageDocsManager.embeddedLanguageDocsFolder === undefined) {
+  //         return
+  //       }
+  //       // Close embedded document tabs when they open automatically
+  //       if (uri.fsPath.includes(embeddedLanguageDocsManager.embeddedLanguageDocsFolder)) {
+  //         if (
+  //           // Prevent prompt to appear on unsaved files
+  //           !tab.isDirty &&
+  //           // Make possible to open embedded documents in a tab
+  //           !tab.isPreview && !tab.isActive && !tab.isPinned
+  //         ) {
+  //           void window.tabGroups.close(tab, false)
+  //         }
+  //       }
+  //     }
+  //   })
+  // })
 
   // Start the client and launch the server
   await client.start()
@@ -173,7 +167,7 @@ export async function getScanResult<
   if ((value === undefined || value === null) && canTriggerScan) {
     // We may not have scanned the recipe yet. Let's try again.
     const progressOptions: vscode.ProgressOptions = {
-      location: vscode.ProgressLocation.Notification,
+      // location: vscode.ProgressLocation.Notification,
       title: `Recipe ${params.recipe} has not been scanned yet. Scanning now...`,
       cancellable: false
     }

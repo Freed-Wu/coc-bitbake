@@ -8,7 +8,7 @@ import fs from 'fs'
 
 import { type EmbeddedLanguageDoc, type EmbeddedLanguageType } from '../lib/src/types/embedded-languages'
 import { logger } from '../lib/src/utils/OutputLogger'
-import { Range, Uri, WorkspaceEdit, workspace } from 'vscode'
+import { Range, Uri, WorkspaceEdit, workspace } from 'coc.nvim'
 import { hashString } from '../lib/src/utils/hash'
 
 const EMBEDDED_DOCUMENTS_FOLDER = 'embedded-documents'
@@ -137,20 +137,20 @@ export default class EmbeddedLanguageDocsManager {
 
   private async updateEmbeddedLanguageDocFile (embeddedLanguageDoc: EmbeddedLanguageDoc, uri: Uri): Promise<void> {
     const document = await workspace.openTextDocument(uri)
-    if (document.isDirty) {
-      this.filesWaitingToUpdate.set(uri.toString(), embeddedLanguageDoc)
-      return
-    }
-    const fullRange = new Range(
-      document.positionAt(0),
-      document.positionAt(document.getText().length)
-    )
-    const workspaceEdit = new WorkspaceEdit()
-    workspaceEdit.replace(uri, fullRange, embeddedLanguageDoc.content)
-    await workspace.applyEdit(workspaceEdit)
-    // Sometimes document closes before the saving, so we open it again just in case
-    await workspace.openTextDocument(uri)
-    await document.save()
+    // if (document.isDirty) {
+    //   this.filesWaitingToUpdate.set(uri.toString(), embeddedLanguageDoc)
+    //   return
+    // }
+    // const fullRange = Range.create(
+    //   document.positionAt(0),
+    //   document.positionAt(document.getText().length)
+    // )
+    // const workspaceEdit = new WorkspaceEdit()
+    // workspaceEdit.replace(uri, fullRange, embeddedLanguageDoc.content)
+    // await workspace.applyEdit(workspaceEdit)
+    // // Sometimes document closes before the saving, so we open it again just in case
+    // await workspace.openTextDocument(uri)
+    // await document.save()
     this.registerEmbeddedLanguageDocInfos(embeddedLanguageDoc, uri)
     const fileWaitingToUpdate = this.filesWaitingToUpdate.get(uri.toString())
     if (fileWaitingToUpdate !== undefined) {
@@ -165,7 +165,7 @@ export default class EmbeddedLanguageDocsManager {
       return undefined
     }
     try {
-      await workspace.fs.writeFile(uri, Buffer.from(embeddedLanguageDoc.content))
+      // await workspace.fs.writeFile(uri, Buffer.from(embeddedLanguageDoc.content))
       await workspace.openTextDocument(uri)
     } catch (err) {
       logger.error(`Failed to create embedded document: ${err as any}`)

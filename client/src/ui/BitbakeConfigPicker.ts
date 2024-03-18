@@ -3,7 +3,7 @@
  * Licensed under the MIT License. See License.txt in the project root for license information.
  * ------------------------------------------------------------------------------------------ */
 
-import * as vscode from 'vscode'
+import * as vscode from 'coc.nvim'
 import { type BitbakeSettings } from '../lib/src/BitbakeSettings'
 import assert from 'assert'
 
@@ -12,7 +12,7 @@ export class BitbakeConfigPicker {
   private bitbakeSettings: BitbakeSettings
   private readonly memento: vscode.Memento | undefined
   private _activeBuildConfiguration: string = 'No BitBake configuration'
-  public readonly onActiveConfigChanged: vscode.EventEmitter<string> = new vscode.EventEmitter<string>()
+  // public readonly onActiveConfigChanged: vscode.EventEmitter<string> = new vscode.EventEmitter<string>()
 
   public get activeBuildConfiguration (): string {
     return this._activeBuildConfiguration
@@ -20,18 +20,18 @@ export class BitbakeConfigPicker {
 
   private set activeBuildConfiguration (value: string) {
     this._activeBuildConfiguration = value
-    this.onActiveConfigChanged.fire(value)
+    // this.onActiveConfigChanged.fire(value)
     void this.memento?.update('BitbakeConfigPicker.activeBuildConfiguration', value)
   }
 
   constructor (bitbakeSettings: BitbakeSettings, context: vscode.ExtensionContext) {
     this.bitbakeSettings = bitbakeSettings
-    this.statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 0)
+    this.statusBarItem = vscode.window.createStatusBarItem(/* vscode.StatusBarAlignment.Right,  */0)
     this.memento = context.workspaceState
     this.activeBuildConfiguration = this.memento?.get('BitbakeConfigPicker.activeBuildConfiguration', 'No BitBake configuration') as string
 
-    this.statusBarItem.command = 'bitbake.pick-configuration'
-    this.statusBarItem.tooltip = 'Select BitBake buildConfiguration'
+    // this.statusBarItem.command = 'bitbake.pick-configuration'
+    // this.statusBarItem.tooltip = 'Select BitBake buildConfiguration'
     context.subscriptions.push(vscode.commands.registerCommand('bitbake.pick-configuration', this.pickConfiguration, this))
     this.updateStatusBar(bitbakeSettings)
   }
@@ -59,11 +59,11 @@ export class BitbakeConfigPicker {
       } else {
         const options = this.bitbakeSettings.buildConfigurations.map((config) => config.name)
         const filteredOptions = options.filter((option) => typeof option === 'string') as string[] // Always all according to the definition in client/package.json
-        const selection = await vscode.window.showQuickPick(filteredOptions, { placeHolder: 'Select a BitBake configuration' })
-        if (selection !== undefined) {
-          this.activeBuildConfiguration = selection
+        // const selection = await vscode.window.showQuickPick(filteredOptions, { placeHolder: 'Select a BitBake configuration' })
+        // if (selection !== undefined) {
+        //   this.activeBuildConfiguration = selection
           this.updateStatusBar(this.bitbakeSettings)
-        }
+        // }
       }
     }
   }

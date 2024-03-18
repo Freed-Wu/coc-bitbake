@@ -3,7 +3,8 @@
  * Licensed under the MIT License. See License.txt in the project root for license information.
  * ------------------------------------------------------------------------------------------ */
 
-import * as vscode from 'vscode'
+import * as vscode from 'coc.nvim'
+import { Thenable } from 'coc.nvim'
 import { type BitbakeWorkspace } from './BitbakeWorkspace'
 import { type ElementInfo, type BitbakeScanResult, type PathInfo, scanContainsData, scanContainsRecipes } from '../lib/src/types/BitbakeScanResult'
 import path from 'path'
@@ -18,17 +19,17 @@ export class BitbakeRecipesView {
   }
 
   registerView (context: vscode.ExtensionContext): void {
-    const view = vscode.window.createTreeView('bitbakeRecipes', { treeDataProvider: this.bitbakeTreeProvider, showCollapseAll: true })
+    const view = vscode.window.createTreeView('bitbakeRecipes', { treeDataProvider: this.bitbakeTreeProvider, /* showCollapseAll: true */ })
     context.subscriptions.push(view)
-    vscode.window.registerTreeDataProvider('bitbakeRecipes', this.bitbakeTreeProvider)
+    // vscode.window.registerTreeDataProvider('bitbakeRecipes', this.bitbakeTreeProvider)
   }
 }
 
 export class BitbakeRecipeTreeItem extends vscode.TreeItem {
   constructor (public readonly label: string, public readonly collapsibleState: vscode.TreeItemCollapsibleState) {
     super(label, collapsibleState)
-    this.contextValue = 'bitbakeRecipeCtx'
-    this.iconPath = new vscode.ThemeIcon('library')
+    // this.contextValue = 'bitbakeRecipeCtx'
+    // this.iconPath = new vscode.ThemeIcon('library')
   }
 }
 
@@ -36,8 +37,8 @@ class BitbakeFileTreeItem extends BitbakeRecipeTreeItem {
   constructor (public readonly pathInfo: PathInfo, public readonly collapsibleState: vscode.TreeItemCollapsibleState) {
     const resolvedPath = path.resolve(pathInfo.dir + '/' + pathInfo.base)
     super(pathInfo.base, collapsibleState)
-    this.contextValue = 'bitbakeFileCtx'
-    this.iconPath = new vscode.ThemeIcon('book')
+    // this.contextValue = 'bitbakeFileCtx'
+    // this.iconPath = new vscode.ThemeIcon('book')
     const uri: vscode.Uri = vscode.Uri.file(resolvedPath)
     this.command = { command: 'vscode.open', title: 'Open file', arguments: [uri] }
     this.description = vscode.workspace.asRelativePath(resolvedPath, false)
@@ -48,8 +49,8 @@ class BitbakeFileTreeItem extends BitbakeRecipeTreeItem {
 class BitbakeTreeDataProvider implements vscode.TreeDataProvider<BitbakeRecipeTreeItem> {
   readonly bitbakeWorkspace: BitbakeWorkspace
 
-  private readonly _onDidChangeTreeData: vscode.EventEmitter<BitbakeRecipeTreeItem | undefined> = new vscode.EventEmitter<BitbakeRecipeTreeItem | undefined>()
-  readonly onDidChangeTreeData: vscode.Event<BitbakeRecipeTreeItem | undefined> = this._onDidChangeTreeData.event
+  // private readonly _onDidChangeTreeData: vscode.EventEmitter<BitbakeRecipeTreeItem | undefined> = new vscode.EventEmitter<BitbakeRecipeTreeItem | undefined>()
+  // readonly onDidChangeTreeData: vscode.Event<BitbakeRecipeTreeItem | undefined> = this._onDidChangeTreeData.event
   private readonly bitbakeProjectScanner: BitBakeProjectScanner
   private bitbakeScanResults: BitbakeScanResult | undefined
 
@@ -58,17 +59,17 @@ class BitbakeTreeDataProvider implements vscode.TreeDataProvider<BitbakeRecipeTr
     this.bitbakeProjectScanner = bitbakeProjectScanner
 
     bitbakeWorkspace.onChange.on('recipeAdded', (recipe: string) => {
-      this._onDidChangeTreeData.fire(undefined)
+      // this._onDidChangeTreeData.fire(undefined)
     })
     bitbakeWorkspace.onChange.on('recipeDropped', (recipe: string) => {
-      this._onDidChangeTreeData.fire(undefined)
+      // this._onDidChangeTreeData.fire(undefined)
     })
     bitbakeProjectScanner.onChange.on('scanReady', (scanResults: BitbakeScanResult) => {
       // In case a parsing error was just introduced, we keep the previous results to keep navigation functional
       if (this.bitbakeScanResults === undefined || !scanContainsRecipes(this.bitbakeScanResults) || scanContainsRecipes(scanResults)) {
         this.bitbakeScanResults = scanResults
       }
-      this._onDidChangeTreeData.fire(undefined)
+      // this._onDidChangeTreeData.fire(undefined)
     })
   }
 
@@ -112,8 +113,8 @@ class BitbakeTreeDataProvider implements vscode.TreeDataProvider<BitbakeRecipeTr
     })
     if (fileItems.length === 0 && scanContainsData(this.bitbakeScanResults)) {
       const errorItem = new BitbakeRecipeTreeItem('Recipe not found', vscode.TreeItemCollapsibleState.None)
-      errorItem.contextValue = undefined
-      errorItem.iconPath = new vscode.ThemeIcon('warning')
+      // errorItem.contextValue = undefined
+      // errorItem.iconPath = new vscode.ThemeIcon('warning')
       errorItem.command = undefined
       errorItem.tooltip = 'Recipe not found'
       fileItems.push(errorItem)
@@ -130,8 +131,8 @@ class BitbakeTreeDataProvider implements vscode.TreeDataProvider<BitbakeRecipeTr
   private getAddRecipeItem (): BitbakeRecipeTreeItem {
     const item = new BitbakeRecipeTreeItem('Add recipe', vscode.TreeItemCollapsibleState.None)
     item.command = { command: 'bitbake.watch-recipe', title: 'Add a recipe to the active workspace', arguments: [undefined] }
-    item.iconPath = new vscode.ThemeIcon('add')
-    item.contextValue = undefined
+    // item.iconPath = new vscode.ThemeIcon('add')
+    // item.contextValue = undefined
     item.tooltip = 'Add a recipe to the active workspace'
     return item
   }

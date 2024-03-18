@@ -3,7 +3,7 @@
  * Licensed under the MIT License. See License.txt in the project root for license information.
  * ------------------------------------------------------------------------------------------ */
 
-import { type Range, type Position } from 'vscode'
+import { type Range, type Position } from 'coc.nvim'
 import { type EmbeddedLanguageType } from './embedded-languages'
 
 export enum RequestType {

@@ -9,18 +9,18 @@ import fs from 'fs'
 import { logger } from '../lib/src/utils/OutputLogger'
 import { type BitbakeSettings, loadBitbakeSettings, sanitizeForShell, type BitbakeBuildConfigSettings, getBuildSetting } from '../lib/src/BitbakeSettings'
 import { clientNotificationManager } from '../ui/ClientNotificationManager'
-import { type BitbakeTaskDefinition } from '../ui/BitbakeTaskProvider'
-import { runBitbakeTerminalCustomCommand } from '../ui/BitbakeTerminal'
+// import { type BitbakeTaskDefinition } from '../ui/BitbakeTaskProvider'
+// import { runBitbakeTerminalCustomCommand } from '../ui/BitbakeTerminal'
 import { bitbakeESDKMode, setBitbakeESDKMode } from './BitbakeESDK'
-import { BITBAKE_EXIT_TIMEOUT, finishProcessExecution, pty } from '../utils/ProcessUtils'
+// import { BITBAKE_EXIT_TIMEOUT, finishProcessExecution, pty } from '../utils/ProcessUtils'
 
-import { type IPty } from 'node-pty'
+// import { type IPty } from 'node-pty'
 
 /// This class is responsible for wrapping up all bitbake classes and exposing them to the extension
 export class BitbakeDriver {
   bitbakeSettings: BitbakeSettings = { pathToBitbakeFolder: '' }
   activeBuildConfiguration: string = 'No BitBake configuration'
-  bitbakeProcess: IPty | undefined
+  bitbakeProcess: /* IPty |  */undefined
   bitbakeProcessCommand: string | undefined
   onBitbakeProcessChange: EventEmitter = new EventEmitter()
 
@@ -45,32 +45,32 @@ export class BitbakeDriver {
   }
 
   /// Execute a command in the bitbake environment
-  async spawnBitbakeProcess (command: string): Promise<IPty> {
-    const { shell, script } = this.prepareCommand(command)
-    const cwd = this.getBuildConfig('workingDirectory')
-    await this.waitForBitbakeToFinish()
-    logger.debug(`Executing Bitbake command with ${shell} in ${cwd}: ${script}`)
-    const child = pty.spawn(
-      shell,
-      ['-c', script],
-      {
-        cwd,
-        env: { ...process.env, ...this.getBuildConfig('shellEnv') }
-      }
-    )
-    this.bitbakeProcess = child
-    this.bitbakeProcessCommand = command
-    const listener = child.onData(() => {
-      this.onBitbakeProcessChange.emit('spawn', command)
-      listener.dispose()
-    })
-    child.onExit(() => {
-      this.bitbakeProcess = undefined
-      this.bitbakeProcessCommand = undefined
-      this.onBitbakeProcessChange.emit('close')
-    })
-    return child
-  }
+  // async spawnBitbakeProcess (command: string): Promise<IPty> {
+  //   const { shell, script } = this.prepareCommand(command)
+  //   const cwd = this.getBuildConfig('workingDirectory')
+  //   await this.waitForBitbakeToFinish()
+  //   logger.debug(`Executing Bitbake command with ${shell} in ${cwd}: ${script}`)
+  //   const child = pty.spawn(
+  //     shell,
+  //     ['-c', script],
+  //     {
+  //       cwd,
+  //       env: { ...process.env, ...this.getBuildConfig('shellEnv') }
+  //     }
+  //   )
+  //   this.bitbakeProcess = child
+  //   this.bitbakeProcessCommand = command
+  //   const listener = child.onData(() => {
+  //     this.onBitbakeProcessChange.emit('spawn', command)
+  //     listener.dispose()
+  //   })
+  //   child.onExit(() => {
+  //     this.bitbakeProcess = undefined
+  //     this.bitbakeProcessCommand = undefined
+  //     this.onBitbakeProcessChange.emit('close')
+  //   })
+  //   return child
+  // }
 
   prepareCommand (command: string): {
     shell: string
@@ -122,56 +122,56 @@ export class BitbakeDriver {
 
     // We could test for devtool and bitbake to know if we are in an eSDK or not
     const command = 'which devtool bitbake || true'
-    const process = runBitbakeTerminalCustomCommand(this, command, 'Bitbake: Sanity test', true)
-    const ret = await finishProcessExecution(process, async () => { await this.killBitbake() })
-    const outLines = ret.stdout.toString().split(/\r?\n/g)
+    // const process = runBitbakeTerminalCustomCommand(this, command, 'Bitbake: Sanity test', true)
+    // const ret = await finishProcessExecution(process, async () => { await this.killBitbake() })
+    // const outLines = ret.stdout.toString().split(/\r?\n/g)
 
-    if (outLines.filter((line) => /devtool$/.test(line)).length === 0) {
-      clientNotificationManager.showBitbakeSettingsError('devtool not found in $PATH\nSee Bitbake Terminal for command output.')
-      return false
-    }
-
-    if (outLines.filter((line) => /bitbake$/.test(line)).length === 0) {
-      setBitbakeESDKMode(true)
-    } else {
-      setBitbakeESDKMode(false)
-    }
+    // if (outLines.filter((line: any) => /devtool$/.test(line)).length === 0) {
+    //   clientNotificationManager.showBitbakeSettingsError('devtool not found in $PATH\nSee Bitbake Terminal for command output.')
+    //   return false
+    // }
+    //
+    // if (outLines.filter((line: any) => /bitbake$/.test(line)).length === 0) {
+    //   setBitbakeESDKMode(true)
+    // } else {
+    //   setBitbakeESDKMode(false)
+    // }
     logger.info(`Bitbake settings are sane, eSDK mode: ${bitbakeESDKMode}`)
 
     return true
   }
 
-  composeBitbakeCommand (bitbakeTaskDefinition: BitbakeTaskDefinition): string {
-    if (bitbakeTaskDefinition.specialCommand !== undefined) {
-      return sanitizeForShell(bitbakeTaskDefinition.specialCommand) as string
-    }
-
-    const OPTIONS_MAP: Record<keyof BitbakeTaskDefinition['options'], string> = {
-      continue: '-k',
-      force: '-f',
-      parseOnly: '-p',
-      env: '-e'
-    }
-
-    let command = 'bitbake'
-
-    bitbakeTaskDefinition.recipes?.forEach(recipe => {
-      command = appendCommandParam(command, `${sanitizeForShell(recipe)}`)
-    })
-    if (bitbakeTaskDefinition.task !== undefined) {
-      command = appendCommandParam(command, `-c ${sanitizeForShell(bitbakeTaskDefinition.task)}`)
-    }
-    const options = bitbakeTaskDefinition.options
-    if (options !== undefined) {
-      Object.keys(options).forEach(key => {
-        if (options[key as keyof BitbakeTaskDefinition['options']] === true) {
-          command = appendCommandParam(command, OPTIONS_MAP[key as keyof BitbakeTaskDefinition['options']])
-        }
-      })
-    }
-
-    return command
-  }
+  // composeBitbakeCommand (bitbakeTaskDefinition: BitbakeTaskDefinition): string {
+  //   if (bitbakeTaskDefinition.specialCommand !== undefined) {
+  //     return sanitizeForShell(bitbakeTaskDefinition.specialCommand) as string
+  //   }
+  //
+  //   const OPTIONS_MAP: Record<keyof BitbakeTaskDefinition['options'], string> = {
+  //     continue: '-k',
+  //     force: '-f',
+  //     parseOnly: '-p',
+  //     env: '-e'
+  //   }
+  //
+  //   let command = 'bitbake'
+  //
+  //   bitbakeTaskDefinition.recipes?.forEach(recipe => {
+  //     command = appendCommandParam(command, `${sanitizeForShell(recipe)}`)
+  //   })
+  //   if (bitbakeTaskDefinition.task !== undefined) {
+  //     command = appendCommandParam(command, `-c ${sanitizeForShell(bitbakeTaskDefinition.task)}`)
+  //   }
+  //   const options = bitbakeTaskDefinition.options
+  //   if (options !== undefined) {
+  //     Object.keys(options).forEach(key => {
+  //       if (options[key as keyof BitbakeTaskDefinition['options']] === true) {
+  //         command = appendCommandParam(command, OPTIONS_MAP[key as keyof BitbakeTaskDefinition['options']])
+  //       }
+  //     })
+  //   }
+  //
+  //   return command
+  // }
 
   composeInteractiveCommand (): string {
     return 'bash'
@@ -192,7 +192,7 @@ export class BitbakeDriver {
   }
 
   /// Try to stop bitbake or terminate it after a timeout
-  async killBitbake (timeout: number = BITBAKE_EXIT_TIMEOUT): Promise<void> {
+  async killBitbake (timeout: number/*  = BITBAKE_EXIT_TIMEOUT */): Promise<void> {
     if (this.bitbakeProcess === undefined) {
       logger.warn('Tried to stop bitbake but no process was running')
       return
@@ -203,14 +203,14 @@ export class BitbakeDriver {
       throw Error('Bitbake process command is undefined')
     }
     let processStopped = false
-    processToStop.onExit(() => {
-      processStopped = true
-      logger.debug('Bitbake process successfully terminated')
-    })
+    // processToStop.onExit(() => {
+    //   processStopped = true
+    //   logger.debug('Bitbake process successfully terminated')
+    // })
 
     // The first SIGINT will wait for current build tasks to complete
     if (!await this.killDockerContainer(commandToStop)) {
-      processToStop?.kill('SIGINT')
+      // processToStop?.kill('SIGINT')
     }
 
     // The second SIGINT will interrupt build tasks after a timeout
@@ -218,7 +218,7 @@ export class BitbakeDriver {
       if (!processStopped) {
         void this.killDockerContainer(commandToStop).then((result) => {
           if (!result) {
-            processToStop.kill('SIGINT')
+            // processToStop.kill('SIGINT')
           }
         })
       }
@@ -229,7 +229,7 @@ export class BitbakeDriver {
       if (!processStopped) {
         void this.killDockerContainer(commandToStop).then((result) => {
           if (!result) {
-            processToStop.kill('SIGINT')
+            // processToStop.kill('SIGINT')
           }
         })
       }
@@ -243,26 +243,26 @@ export class BitbakeDriver {
 
     // Our process will look something like this in `ps`:
     // deribau+  405680  405597 21 17:13 ?        00:00:00 python3 /home/deribaucourt/Workspace/yocto-vscode/yocto/yocto-build/sources/poky/bitbake/bin/bitbake linux-yocto
-    const ps = pty.spawn('ps', ['-efwwa'], {})
-    const ret = await finishProcessExecution(Promise.resolve(ps))
-
-    const stdout = ret.stdout.toString()
-    const lines = stdout.split(/\r?\n/g).slice(1, -1)
-    let bitbakeProcesses = lines.filter((line) => line.split(/\s+/)[7] === 'python3')
-    bitbakeProcesses = bitbakeProcesses.filter((line) => line.includes(command))
-    logger.debug('Bitbake process: ' + JSON.stringify(bitbakeProcesses))
-
-    if (bitbakeProcesses.length > 1) {
-      logger.warn('Multiple bitbake process found. Could not determine which one to stop.')
-      return false
-    }
-
-    if (bitbakeProcesses.length === 1) {
-      const pid = bitbakeProcesses[0].split(/\s+/)[1]
-      logger.info('Stopping bitbake process with PID: ' + pid)
-      pty.spawn('kill', ['-s', 'SIGINT', pid], {})
-      return true
-    }
+    // const ps = pty.spawn('ps', ['-efwwa'], {})
+    // const ret = await finishProcessExecution(Promise.resolve(ps))
+    //
+    // const stdout = ret.stdout.toString()
+    // const lines = stdout.split(/\r?\n/g).slice(1, -1)
+    // let bitbakeProcesses = lines.filter((line: any) => line.split(/\s+/)[7] === 'python3')
+    // bitbakeProcesses = bitbakeProcesses.filter((line: any) => line.includes(command))
+    // logger.debug('Bitbake process: ' + JSON.stringify(bitbakeProcesses))
+    //
+    // if (bitbakeProcesses.length > 1) {
+    //   logger.warn('Multiple bitbake process found. Could not determine which one to stop.')
+    //   return false
+    // }
+    //
+    // if (bitbakeProcesses.length === 1) {
+    //   const pid = bitbakeProcesses[0].split(/\s+/)[1]
+    //   logger.info('Stopping bitbake process with PID: ' + pid)
+    //   // pty.spawn('kill', ['-s', 'SIGINT', pid], {})
+    //   return true
+    // }
 
     return false
   }

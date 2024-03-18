@@ -3,8 +3,8 @@
  * Licensed under the MIT License. See License.txt in the project root for license information.
  * ------------------------------------------------------------------------------------------ */
 
-import vscode from 'vscode'
-import { type LanguageClient } from 'vscode-languageclient/node'
+import vscode from 'coc.nvim'
+import { type LanguageClient, Uri } from 'coc.nvim'
 import { RequestMethod, type RequestResult } from './lib/src/types/requests'
 import { logger } from './lib/src/utils/OutputLogger'
 import path from 'path'
@@ -77,7 +77,7 @@ export class BitbakeDocumentLinkProvider implements vscode.DocumentLinkProvider 
       // Handle files: provide a direct link to the file
       const fileUri = foundFiles.find(file => this.basenameIsEqual(file.fsPath, link.value))
       if (fileUri !== undefined) {
-        documentLinks.push({ ...new vscode.DocumentLink(link.range, fileUri), tooltip: 'Bitbake: Go to file' })
+        documentLinks.push({ ...vscode.DocumentLink.create(link.range, fileUri.toString()), tooltip: 'Bitbake: Go to file' })
         continue
       }
 
@@ -90,7 +90,7 @@ export class BitbakeDocumentLinkProvider implements vscode.DocumentLinkProvider 
         */
         const targetUri = vscode.Uri.parse(`command:revealInExplorer?${encodeURIComponent(JSON.stringify(vscode.Uri.parse(foundDir)))}`)
         // targetUri = vscode.Uri.parse('file://' + foundDir)
-        documentLinks.push({ ...new vscode.DocumentLink(link.range, targetUri), tooltip: 'Bitbake: Reveal in explorer' })
+        documentLinks.push({ ...vscode.DocumentLink.create(link.range, targetUri.toString()), tooltip: 'Bitbake: Reveal in explorer' })
       }
     }
 
@@ -99,6 +99,6 @@ export class BitbakeDocumentLinkProvider implements vscode.DocumentLinkProvider 
 
   async provideDocumentLinks (document: vscode.TextDocument, token: vscode.CancellationToken): Promise<vscode.DocumentLink[]> {
     const linksData = await this.client.sendRequest<RequestResult['getLinksInDocument']>(RequestMethod.getLinksInDocument, { documentUri: document.uri.toString() })
-    return await this.resolveUris(document.uri, linksData, token)
+    return await this.resolveUris(Uri.parse(document.uri), linksData, token)
   }
 }

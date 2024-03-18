@@ -4,7 +4,7 @@
  * ------------------------------------------------------------------------------------------ */
 
 import { EventEmitter } from 'events'
-import type * as vscode from 'vscode'
+import type * as vscode from 'coc.nvim'
 
 /// Class representing active bitbake recipes for a bitbake project
 export class BitbakeWorkspace {

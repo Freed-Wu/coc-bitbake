@@ -3,7 +3,7 @@
  * Licensed under the MIT License. See License.txt in the project root for license information.
  * ------------------------------------------------------------------------------------------ */
 
-import { type Memento, commands, window } from 'vscode'
+import { type Memento, commands, window, Thenable } from 'coc.nvim'
 import { logger } from '../lib/src/utils/OutputLogger'
 
 export class ClientNotificationManager {

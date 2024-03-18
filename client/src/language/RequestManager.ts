@@ -3,8 +3,8 @@
  * Licensed under the MIT License. See License.txt in the project root for license information.
  * ------------------------------------------------------------------------------------------ */
 
-import { type Position } from 'vscode'
-import { type LanguageClient } from 'vscode-languageclient/node'
+import { type Position } from 'coc.nvim'
+import { type LanguageClient } from 'coc.nvim'
 
 import { RequestMethod, type RequestParams, type RequestResult } from '../lib/src/types/requests'
 import { getAllVariableValues } from './languageClient'
