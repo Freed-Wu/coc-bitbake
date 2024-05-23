@@ -32,9 +32,7 @@
     "Programming Languages"
   ],
   "activationEvents": [
-    "onLanguage:bitbake",
-    "workspaceContains:**/bblayers.conf",
-    "workspaceContains:**/*.bb"
+    "onLanguage:bitbake"
   ],
   "main": "./out/extension.js",
   "browser": "./out/extension-web",
